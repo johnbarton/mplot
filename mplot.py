@@ -62,6 +62,8 @@ fontfamily   = 'Helvetica'
 textcolor    = defcolor
 
 #import matplotlib.font_manager as fm
+#fontprop = fm.FontProperties(fname='/Users/jpbarton/Library/Fonts/otf2ttf-texgyrepagella-regular.ttf')
+#fontprop = fm.FontProperties(fname='/Users/jpbarton/Library/Fonts/cmunbmr.ttf')
 
 def_labelprops = {
     'family'   : fontfamily,
@@ -74,7 +76,7 @@ def_labelprops = {
 def_sublabelprops = {
     'family' : fontfamily,
     'size'   : sizesublabel,
-    #'weight' : 'bold',
+    'weight' : 'bold',
     'ha'     : 'center',
     'va'     : 'center',
     'color'  : 'k'
@@ -970,6 +972,11 @@ def plotaxes(**pdata):
             else:                                                  xxmax = np.max(pdata['ax'].get_xticks())
         else:                                                      xxmax = np.max(pdata['ax'].get_xlim())
 
+    # x axis height
+    
+    if 'xaxy' in pdata: xaxy = pdata['xaxy']
+    else:               xaxy = np.min(pdata['ax'].get_ylim())
+
     # y axis start location
 
     if 'yaxstart' in pdata: yymin = pdata['yaxstart']
@@ -988,11 +995,16 @@ def plotaxes(**pdata):
             else:                                                  yymax = np.max(pdata['ax'].get_yticks())
         else:                                                      yymax = np.max(pdata['ax'].get_ylim())
 
+    # y axis position
+    
+    if 'yaxx' in pdata: yaxx = pdata['yaxx']
+    else:               yaxx = np.min(pdata['ax'].get_xlim())
+
     # Get axes limits
 
     ax_xx = [xxmin, xxmax]
-    ax_xy = [np.min(pdata['ax'].get_ylim()), np.min(pdata['ax'].get_ylim())]
-    ax_yx = [np.min(pdata['ax'].get_xlim()), np.min(pdata['ax'].get_xlim())]
+    ax_xy = [ xaxy,  xaxy]
+    ax_yx = [ yaxx,  yaxx]
     ax_yy = [yymin, yymax]
     
     if 'mirrory' in pdata and pdata['mirrory']: ax_yx = [np.max(pdata['ax'].get_xlim()), np.max(pdata['ax'].get_xlim())]
