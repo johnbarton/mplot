@@ -61,16 +61,10 @@ sizeline     = 0.8
 fontfamily   = 'Helvetica'
 textcolor    = defcolor
 
-#import matplotlib.font_manager as fm
-#fontprop = fm.FontProperties(fname='/Users/jpbarton/Library/Fonts/otf2ttf-texgyrepagella-regular.ttf')
-#fontprop = fm.FontProperties(fname='/Users/jpbarton/Library/Fonts/cmunbmr.ttf')
-
 def_labelprops = {
-    'family'   : fontfamily,
-    #'fontproperties' : fontprop,
-    'size'     : sizelabel,
-    'color'    : textcolor,
-    #'labelpad' : 2
+    'family' : fontfamily,
+    'size'   : sizelabel,
+    'color'  : textcolor
     }
 
 def_sublabelprops = {
@@ -84,7 +78,6 @@ def_sublabelprops = {
 
 def_ticklabelprops = {
     'family' : fontfamily,
-    #'fontproperties' : fontprop,
     'size'   : sizetick,
     'color'  : textcolor
     }
@@ -122,7 +115,7 @@ def_legendprops = {
     'frameon'       : False,
     'scatterpoints' : 1,
     'handletextpad' : -0.1,
-    'prop'          : {'size' : sizelabel}#, 'fontproperties' : fontprop}
+    'prop'          : {'size' : sizelabel}
     }
 
 def_scatterprops = {
@@ -134,15 +127,15 @@ def_scatterprops = {
 # Define a new function "callout" which circles points on a scatter plot and labels them
 # Need properties for the arrows, the scatter points, and the text
 def_callscatterprops = {
-    'lw'        : sizeline,
-    's'         : sizedot,
-    'marker'    : 'o'
+    'lw'     : sizeline,
+    's'      : sizedot,
+    'marker' : 'o'
     }
 
 def_callarrowprops = {
-    'lw'        : sizeline,
-    's'         : sizedot,
-    'marker'    : 'o'
+    'lw'     : sizeline,
+    's'      : sizedot,
+    'marker' : 'o'
     }
 
 def_errorprops = {
@@ -192,6 +185,14 @@ def_violinprops = {
     'showmedians' : False,
     'points'      : 100,    # number of points to evaluate for Gaussian KDE
     'bw_method'   : 'silverman'
+    }
+
+def_hexbinprops = {
+    'gridsize' : (50,50),
+    'mincnt'   : 1,
+    'xscale'   : 'linear',
+    'yscale'   : 'linear',
+    'lw'       : axwidth/4.
     }
 
 def_vplineprops = {
@@ -347,6 +348,7 @@ def plot(**pdata):
         if pdata['type']=='kde':     pdata['plotprops'] = def_lineprops
         if pdata['type']=='circos':  pdata['plotprops'] = def_lineprops
         if pdata['type']=='violin':  pdata['plotprops'] = def_violinprops
+        if pdata['type']=='hexbin':  pdata['plotprops'] = def_hexbinprops
 
     # Fill in x axis limits and ticks if not passed in pdata
     
@@ -432,6 +434,7 @@ def plot(**pdata):
     elif pdata['type']=='kde':     kde(**pdata)
     elif pdata['type']=='circos':  circos(**pdata)
     elif pdata['type']=='violin':  violin(**pdata)
+    elif pdata['type']=='hexbin':  hexbin(**pdata)
 
     # Set plot appearance and plot axes
     
@@ -838,7 +841,6 @@ def violin(**pdata):
             line.set_linewidth(axwidth)
         for line in [vp[l] for l in hideLines if l in vp]:
             line.set_linewidth(0)
-    
 
     # Make legend (optional)
 
@@ -851,6 +853,26 @@ def violin(**pdata):
             pdata['ax'].plot(x, y, color=c, label=l, **pdata['plotprops'])
         l = pdata['ax'].legend(**pdata['legendprops'])
         for text in l.get_texts(): text.set_color(textcolor)
+
+
+def hexbin(**pdata):
+    """
+    2D histogram with hexagonal bins.
+    """
+
+    # Plot data
+
+    for i in range(len(pdata['x'])):
+        x = pdata['x'][i]
+        y = pdata['y'][i]
+        
+        hb = pdata['ax'].hexbin(x, y, **pdata['plotprops'])
+
+    # Annotate (optional)
+
+    if 'annotate' in pdata:
+        for i in range(len(pdata['annotate'])):
+            pdata['ax'].text(pdata['annotate'][i][0], pdata['annotate'][i][1], pdata['annotate'][i][2], **pdata['ticklabelprops'])
 
 
 def setappearance(**pdata):
