@@ -158,7 +158,8 @@ def_histprops = {
     'histtype'  : 'bar',
     'lw'        : sizeline/2,
     'ls'        : 'solid',
-    'edgecolor' : defcolor
+    'edgecolor' : defcolor,
+    'align'     : 'left'
     }
 
 # OLD STYLE OUTLINE
