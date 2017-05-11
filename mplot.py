@@ -196,6 +196,11 @@ def_hexbinprops = {
     'lw'       : axwidth/4.
     }
 
+def_contourprops = {
+    'linewidths' : sizeline/2,
+    'linestyles' : 'solid'
+    }
+
 def_vplineprops = {
     'lw'    : axwidth,
     'color' : defcolor
@@ -262,9 +267,7 @@ singlevartypes = ['hist', 'kde', 'violin']
 ############# PLOTTING  FUNCTIONS #############
 
 def plot(**pdata):
-    """
-    Generic plotting routine. Sets basic options then passes parameters to detailed plotting functions.
-    """
+    """ Generic plotting routine. Sets basic options then passes parameters to detailed plotting functions. """
     
     # Sanity checks
     
@@ -350,6 +353,7 @@ def plot(**pdata):
         if pdata['type']=='circos':  pdata['plotprops'] = def_lineprops
         if pdata['type']=='violin':  pdata['plotprops'] = def_violinprops
         if pdata['type']=='hexbin':  pdata['plotprops'] = def_hexbinprops
+        if pdata['type']=='contour': pdata['plotprops'] = def_contourprops
 
     # Fill in x axis limits and ticks if not passed in pdata
     
@@ -436,6 +440,7 @@ def plot(**pdata):
     elif pdata['type']=='circos':  circos(**pdata)
     elif pdata['type']=='violin':  violin(**pdata)
     elif pdata['type']=='hexbin':  hexbin(**pdata)
+    elif pdata['type']=='contour': contour(**pdata)
 
     # Set plot appearance and plot axes
     
@@ -465,9 +470,7 @@ def plot(**pdata):
 
 
 def scatter(**pdata):
-    """
-    Generic scatter plot.
-    """
+    """ Generic scatter plot. """
 
     # Plot data
     
@@ -523,9 +526,7 @@ def scatter(**pdata):
 
 
 def error(**pdata):
-    """
-    Generic errorbar plot.
-    """
+    """ Generic errorbar plot. """
 
     # Plot data
     
@@ -583,9 +584,7 @@ def error(**pdata):
 
 
 def line(**pdata):
-    """
-    Generic line plot.
-    """
+    """ Generic line plot. """
 
     # Plot data
 
@@ -616,9 +615,7 @@ def line(**pdata):
 
 
 def hist(**pdata):
-    """
-    Generic histogram.
-    """
+    """ Generic histogram. """
 
     # Plot data
 
@@ -657,9 +654,7 @@ def hist(**pdata):
 
 
 def bar(**pdata):
-    """
-    Generic bar graph.
-    """
+    """ Generic bar graph. """
     
     # Check alignment
 
@@ -711,9 +706,7 @@ def bar(**pdata):
 
 
 def kde(**pdata):
-    """
-    Generic kde-smoothed plot.
-    """
+    """ Generic kde-smoothed plot. """
 
     # Plot data
 
@@ -739,9 +732,7 @@ def kde(**pdata):
 
 
 def circos(**pdata):
-    """
-    Generic circos-style plot.
-    """
+    """ Generic circos-style plot. """
     
     # Generate Bezier curves using index to angle map
     
@@ -799,9 +790,7 @@ def circos(**pdata):
 
 
 def violin(**pdata):
-    """
-    Generic violin plot.
-    """
+    """ Generic violin plot. """
 
     # Plot data
 
@@ -857,9 +846,7 @@ def violin(**pdata):
 
 
 def hexbin(**pdata):
-    """
-    2D histogram with hexagonal bins.
-    """
+    """ 2D histogram with hexagonal bins. """
 
     # Plot data
 
@@ -876,10 +863,27 @@ def hexbin(**pdata):
             pdata['ax'].text(pdata['annotate'][i][0], pdata['annotate'][i][1], pdata['annotate'][i][2], **pdata['ticklabelprops'])
 
 
+def contour(**pdata):
+    """ Generic contour plot. """
+
+    # Plot data
+
+    for i in range(len(pdata['x'])):
+        x = pdata['x'][i]
+        y = pdata['y'][i]
+        z = pdata['z'][i]
+        
+        pdata['ax'].contour(x, y, z, **pdata['plotprops'])
+
+    # Annotate (optional)
+
+    if 'annotate' in pdata:
+        for i in range(len(pdata['annotate'])):
+            pdata['ax'].text(pdata['annotate'][i][0], pdata['annotate'][i][1], pdata['annotate'][i][2], **pdata['ticklabelprops'])
+
+
 def setappearance(**pdata):
-    """
-    Set out general plot appearance (axis labels, tick parameters, etc).
-    """
+    """ Set out general plot appearance (axis labels, tick parameters, etc). """
 
     # Make axis invisible
 
@@ -968,9 +972,7 @@ def setappearance(**pdata):
 
 
 def plotaxes(**pdata):
-    """
-    Add axes to a plot.
-    """
+    """ Add axes to a plot. """
     
     xxmin = 0
     xxmax = 0
@@ -1123,9 +1125,7 @@ def deg2rad(x):
 
 
 def polar2cart(r, t):
-    """
-    Convert polar to cartesian coordinates.
-    """
+    """ Convert polar to cartesian coordinates. """
 
     x = r * np.cos(t)
     y = r * np.sin(t)
@@ -1134,9 +1134,7 @@ def polar2cart(r, t):
 
 
 def cart2polar(x, y):
-    """
-    Convert cartesian to polar coordinates.
-    """
+    """ Convert cartesian to polar coordinates. """
 
     r = np.sqrt((x**2)+(y**2))
     t = np.arccos(x/r)
@@ -1148,9 +1146,7 @@ def cart2polar(x, y):
 
 
 def adjustlim(lim, logscale):
-    """
-    Adjust limits to slightly offset the data from the axes.
-    """
+    """ Adjust limits to slightly offset the data from the axes. """
 
     if logscale:
         lim[0] = np.exp( np.log(lim[0]) - (offset / (1.0 - offset)) * (np.log(lim[1]) - np.log(lim[0])) )
@@ -1163,9 +1159,7 @@ def adjustlim(lim, logscale):
 
 
 def getticks(lim):
-    """
-    Return a set of linearly spaced ticks, including the upper and lower limits as major ticks.
-    """
+    """ Return a set of linearly spaced ticks, including the upper and lower limits as major ticks. """
 
     tick      = np.array([lim[0], lim[1]])
     dx        = (tick[1]-tick[0])/5.0
@@ -1175,9 +1169,7 @@ def getticks(lim):
 
 
 def getlogticks(lim, insertLow=False, insertHigh=True):
-    """
-    Return a set of logarithmically spaced ticks, including the upper and lower limits as major ticks.
-    """
+    """ Return a set of logarithmically spaced ticks, including the upper and lower limits as major ticks. """
 
     tick      = []
     minortick = []
