@@ -593,7 +593,8 @@ def line(**pdata):
         x = pdata['x'][i]
         y = pdata['y'][i]
         
-        pdata['ax'].plot(x, y, color=c, zorder=len(pdata['x'])-i, **pdata['plotprops'])
+        if 'zorder' not in pdata['plotprops']: pdata['ax'].plot(x, y, color=c, zorder=len(pdata['x'])-i, **pdata['plotprops'])
+        else:                                  pdata['ax'].plot(x, y, color=c,                           **pdata['plotprops'])
         
 #        if 'legend' in pdata:
 #            pdata['ax'].plot(x, y, color=c, zorder=len(pdata['x'])-i, label=pdata['legend'][i], **pdata['plotprops'])
