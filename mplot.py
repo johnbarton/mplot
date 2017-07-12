@@ -1041,8 +1041,12 @@ def plotaxes(**pdata):
         aspect = (pts[1][1]-pts[0][1])/(pts[1][0]-pts[0][0])
 #    elif aspect=='equal':
 #        aspect = 1
-    offsetl = np.max([offsetpt * aspect, offsetpt])
-    offsetb = np.max([offsetpt / aspect, offsetpt])
+
+    offset  = offsetpt
+    if 'axoffset' in pdata: offset = pdata['axoffset']
+
+    offsetl = np.max([offset * aspect, offset])
+    offsetb = np.max([offset / aspect, offset])
     
     # Plot axes ('open' style)
     
