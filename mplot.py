@@ -153,6 +153,12 @@ def_lineprops = {
     #'drawstyle' : 'steps'
     }
 
+def_fillprops = {
+    'lw'          : sizeline,
+    'linestyle'   : '-',
+    'interpolate' : True
+    }
+
 # NEW STYLE SOLID
 def_histprops = {
     'histtype'  : 'bar',
@@ -347,6 +353,7 @@ def plot(**pdata):
         if pdata['type']=='scatter': pdata['plotprops'] = def_scatterprops
         if pdata['type']=='error':   pdata['plotprops'] = def_errorprops
         if pdata['type']=='line':    pdata['plotprops'] = def_lineprops
+        if pdata['type']=='fill':    pdata['plotprops'] = def_fillprops
         if pdata['type']=='hist':    pdata['plotprops'] = def_histprops
         if pdata['type']=='bar':     pdata['plotprops'] = def_barprops
         if pdata['type']=='kde':     pdata['plotprops'] = def_lineprops
@@ -411,6 +418,8 @@ def plot(**pdata):
         if 'yminorticks' not in pdata: pdata['yminorticks'] = yminortick
     if 'yminorticks' not in pdata: pdata['yminorticks'] = []
 
+    if pdata['type']=='fill' and 'y2' not in pdata: pdata['y2']=0
+
     # Sanity check for ticks and log scale
 
     if 'logx' in pdata and pdata['logx']:
@@ -434,6 +443,7 @@ def plot(**pdata):
     if   pdata['type']=='scatter': scatter(**pdata)
     elif pdata['type']=='error':   error(**pdata)
     elif pdata['type']=='line':    line(**pdata)
+    elif pdata['type']=='fill':    fill(**pdata)
     elif pdata['type']=='hist':    hist(**pdata)
     elif pdata['type']=='bar':     bar(**pdata)
     elif pdata['type']=='kde':     kde(**pdata)
@@ -602,6 +612,32 @@ def line(**pdata):
 #        else:
 #            pdata['ax'].plot(x, y, color=c, zorder=len(pdata['x'])-i, **pdata['plotprops'])
 
+    # Make legend (optional)
+
+    if 'legend' in pdata:# and 'plotlegend' in pdata:
+        x = [10 * pdata['xlim'][1], 10 * pdata['xlim'][1]]
+        y = [10 * pdata['ylim'][1], 10 * pdata['ylim'][1]]
+        for i in range(len(pdata['legend'])):
+            c = pdata['colors'][i]
+            l = pdata['legend'][i]
+            pdata['ax'].plot(x, y, color=c, label=l, **pdata['plotprops'])
+        l = pdata['ax'].legend(**pdata['legendprops'])
+        for text in l.get_texts(): text.set_color(textcolor)
+
+
+def fill(**pdata):
+    """ Generic filled line plot. """
+
+    # Plot data
+
+    for i in range(len(pdata['x'])):
+        c = pdata['colors'][i]
+        x = pdata['x'][i]
+        y = pdata['y'][i]
+        
+        if 'zorder' not in pdata['plotprops']: pdata['ax'].fill_between(x, y, color=c, zorder=len(pdata['x'])-i, **pdata['plotprops'])
+        else:                                  pdata['ax'].fill_between(x, y, color=c                            **pdata['plotprops'])
+    
     # Make legend (optional)
 
     if 'legend' in pdata:# and 'plotlegend' in pdata:
