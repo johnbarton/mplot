@@ -903,6 +903,11 @@ def hexbin(**pdata):
 def contour(**pdata):
     """ Generic contour plot. """
 
+    # Sort out contour shading plot props from line props
+    
+    cShade = ['cmap', 'hatches']
+    cLine  = ['linewidths', 'linestyles']
+
     # Plot data
 
     for i in range(len(pdata['x'])):
@@ -910,7 +915,18 @@ def contour(**pdata):
         y = pdata['y'][i]
         z = pdata['z'][i]
         
-        pdata['ax'].contour(x, y, z, **pdata['plotprops'])
+        tempprops = deepcopy(pdata['plotprops'])
+        for prop in cLine:
+            if prop in tempprops: del tempprops[prop]
+        if 'colors' in tempprops and 'cmap' in tempprops: del tempprops['colors']
+        
+        pdata['ax'].contourf(x, y, z, **tempprops)
+        
+        tempprops = deepcopy(pdata['plotprops'])
+        for prop in cShade:
+            if prop in tempprops: del tempprops[prop]
+        
+        pdata['ax'].contour(x, y, z, **tempprops)
 
     # Annotate (optional)
 
