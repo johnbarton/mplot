@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.ticker import FixedLocator
 from scipy.stats.kde   import gaussian_kde
+from copy import deepcopy
 
 ############# PARAMETERS #############
 
