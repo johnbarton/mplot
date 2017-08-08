@@ -557,18 +557,18 @@ def error(**pdata):
         if 'facecolor' in pdata and pdata['facecolor'][i] and 'edgecolor' in pdata and pdata['edgecolor'][i]:
             cf = pdata['facecolor'][i]
             ce = pdata['edgecolor'][i]
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,         mec=ce, ecolor=ce, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=cf, mec=ce, ecolor=ce, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,         mec=ce, color=ce, zorder=len(pdata['x'])-i+10, **hollowprops)
+            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=cf, mec=ce, color=ce, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
         
         elif 'colors' in pdata and pdata['colors'][i]:
             c = pdata['colors'][i]
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,        mec=c, ecolor=c, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=c, mec=c, ecolor=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,        mec=c, color=c, zorder=len(pdata['x'])-i+10, **hollowprops)
+            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=c, mec=c, color=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
 
         else:
             c = defcolor
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,        mec=c, ecolor=c, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=c, mec=c, ecolor=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr,        mec=c, color=c, zorder=len(pdata['x'])-i+10, **hollowprops)
+            else:                                        pdata['ax'].errorbar(x, y, xerr=xerr, yerr=yerr, mfc=c, mec=c, color=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
 
 #    for i in range(len(pdata['x'])):
 #        c = pdata['colors'][i]
@@ -835,8 +835,12 @@ def violin(**pdata):
     for i in range(len(pdata['x'])):
         x   = pdata['x'][i]
         pos = [i+1]
-        if 'positions' in pdata: pos = [pdata['positions'][i]]
+        if 'positions' in pdata: pos = pdata['positions'][i]
         
+        #print(pos)
+        #print(len(x))
+        
+        #vp = pdata['ax'].violinplot(x, **pdata['plotprops'])
         vp = pdata['ax'].violinplot(x, positions=pos, **pdata['plotprops'])
     
         # Adjust appearance
