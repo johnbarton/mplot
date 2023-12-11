@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
+#matplotlib.rcParams['pdf.fonttype'] = 42
+
 from matplotlib.ticker import FixedLocator
 from scipy.stats.kde   import gaussian_kde
 from copy import deepcopy
@@ -49,18 +51,39 @@ offset       = 0.02
 offsetpt     = 1.0
 sublabelx    = -0.10
 sublabely    = 0.95
-sizesublabel = 8
-sizetext     = 7#6
-sizelabel    = 7#6
-sizetick     = 6#5
 ticklength   = 3
 tickpad      = 3
 axwidth      = 0.4
 sizedot      = 8.
-smallsizedot = 6.#4.
 sizeline     = 0.8
-fontfamily   = 'Helvetica'
 textcolor    = defcolor
+
+# paper
+fontfamily   = 'Arial'
+sizesublabel = 8+1
+sizetext     = 6
+sizelabel    = 6
+sizetick     = 6
+smallsizedot = 6.
+
+## grant
+#fontfamily   = 'Arial'
+#sizesublabel = 12
+#sizetext     = 8
+#sizelabel    = 8
+#sizetick     = 8
+#smallsizedot = 6. * 2
+#sizeline     = 1
+
+##slides/poster
+#fontfamily   = 'Avenir'
+#sizesublabel = 18 #24
+#sizetext     = 18 #24
+#sizelabel    = 18 #24
+#sizetick     = 18 #24
+#smallsizedot = 6. * 4
+#axwidth      = 1.5
+#sizeline     = 3.0
 
 def_labelprops = {
     'family' : fontfamily,
@@ -496,18 +519,18 @@ def scatter(**pdata):
         if 'facecolor' in pdata and pdata['facecolor'][i] and 'edgecolor' in pdata and pdata['edgecolor'][i]:
             cf = pdata['facecolor'][i]
             ce = pdata['edgecolor'][i]
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,               edgecolor=ce, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].scatter(x, y, facecolor=cf, edgecolor=ce, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,               edgecolor=ce, **hollowprops)
+            else:                                        pdata['ax'].scatter(x, y, facecolor=cf, edgecolor=ce, **pdata['plotprops'])
         
         elif 'colors' in pdata and pdata['colors'][i]:
             c = pdata['colors'][i]
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,              edgecolor=c, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].scatter(x, y, facecolor=c, edgecolor=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,              edgecolor=c, **hollowprops)
+            else:                                        pdata['ax'].scatter(x, y, facecolor=c, edgecolor=c, **pdata['plotprops'])
 
         else:
             c = defcolor
-            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,              edgecolor=c, zorder=len(pdata['x'])-i+10, **hollowprops)
-            else:                                        pdata['ax'].scatter(x, y, facecolor=c, edgecolor=c, zorder=len(pdata['x'])-i+10, **pdata['plotprops'])
+            if 'hollow' in pdata and pdata['hollow'][i]: pdata['ax'].scatter(x, y,              edgecolor=c, **hollowprops)
+            else:                                        pdata['ax'].scatter(x, y, facecolor=c, edgecolor=c, **pdata['plotprops'])
 
     # Make legend (optional)
 
@@ -717,7 +740,7 @@ def bar(**pdata):
         err_kw = {}
         if 'xerr' in pdata and np.any(pdata['xerr']) and np.any(pdata['xerr'][i]): xerr = pdata['xerr'][i]
         if 'yerr' in pdata and np.any(pdata['yerr']) and np.any(pdata['yerr'][i]): yerr = pdata['yerr'][i]
-        if xerr or yerr: err_kw = { 'ecolor' : defcolor, 'capsize' : 0 }
+        if np.any(xerr) or np.any(yerr): err_kw = { 'ecolor' : defcolor, 'capsize' : 0 }
         
         if isHorizontal: pdata['ax'].barh(x, y, xerr=xerr, yerr=yerr, color=c, zorder=len(pdata['x'])-1-i, error_kw=err_kw, **pdata['plotprops'])
         else:            pdata['ax'].bar( x, y, xerr=xerr, yerr=yerr, color=c, zorder=len(pdata['x'])-1-i, error_kw=err_kw, **pdata['plotprops'])
@@ -774,13 +797,21 @@ def circos(**pdata):
     
     # Generate Bezier curves using index to angle map
     
-    if 't' not in pdata:      pdata['t']      = np.arange(0., 1.01, 0.01)
-    if 'rad' not in pdata:    pdata['rad']    = [[0.8, 0.8] for i in range(len(pdata['x']))]
-    if 'size' not in pdata:   pdata['size']   = float(np.max([np.max(pdata['x']), np.max(pdata['y'])]))
-    if 'bezrad' not in pdata: pdata['bezrad'] = 0.
+    if 't' not in pdata:
+        pdata['t'] = np.arange(0., 1.01, 0.01)
+    if 'rad' not in pdata:
+        pdata['rad'] = [[0.8, 0.8] for i in range(len(pdata['x']))]
+    if 'size' not in pdata:
+        pdata['size'] = float(np.max([np.max(pdata['x']), np.max(pdata['y'])]))
+    if 'bezrad' not in pdata:
+        pdata['bezrad'] = 0.
+    if not hasattr(pdata['bezrad'], '__len__'):
+        temp = pdata['bezrad']
+        pdata['bezrad'] = [temp for i in range(len(pdata['rad']))]
+    if 'angle' not in pdata:
+        pdata['angle'] = [[-2 * np.pi * pdata['x'][i] / pdata['size'], -2 * np.pi * pdata['y'][i] / pdata['size']] for i in range(len(pdata['x']))]
     
-    pdata['angle'] = [[-2 * np.pi * pdata['x'][i] / pdata['size'], -2 * np.pi * pdata['y'][i] / pdata['size']] for i in range(len(pdata['x']))]
-    cpolar         = bezier(pdata['rad'], pdata['angle'], pdata['t'], pdata['bezrad'])
+    cpolar = bezier(pdata['rad'], pdata['angle'], pdata['t'], pdata['bezrad'])
 
     # Plot data
 
@@ -975,8 +1006,11 @@ def setappearance(**pdata):
     #if 'logx' in pdata and pdata['logx']: pdata['ax'].set_xscale('log')
     #if 'logy' in pdata and pdata['logy']: pdata['ax'].set_yscale('log')
     
-    if 'logx' in pdata and pdata['logx']: pdata['ax'].set_xscale('log', nonposx='clip')
-    if 'logy' in pdata and pdata['logy']: pdata['ax'].set_yscale('log', nonposy='clip')
+    if 'logx' in pdata and pdata['logx']: pdata['ax'].set_xscale('log', nonpositive='clip')  # GitHub
+    if 'logy' in pdata and pdata['logy']: pdata['ax'].set_yscale('log', nonpositive='clip')
+    
+#    if 'logx' in pdata and pdata['logx']: pdata['ax'].set_xscale('log', nonposx='clip')  # Code Ocean
+#    if 'logy' in pdata and pdata['logy']: pdata['ax'].set_yscale('log', nonposy='clip')
     
     if 'xlim' in pdata: pdata['ax'].set_xlim(pdata['xlim'][0], pdata['xlim'][1])
     if 'ylim' in pdata: pdata['ax'].set_ylim(pdata['ylim'][0], pdata['ylim'][1])
@@ -1099,7 +1133,7 @@ def plotaxes(**pdata):
 #    elif aspect=='equal':
 #        aspect = 1
 
-    offset  = offsetpt
+    offset = offsetpt
     if 'axoffset' in pdata: offset = pdata['axoffset']
 
     offsetl = np.max([offset * aspect, offset])
@@ -1123,6 +1157,21 @@ def plotaxes(**pdata):
         #for axis in ['left', 'right']: pdata['ax'].spines[axis].set_position(('outward', offsetl))
         #for axis in ['bottom', 'top']: pdata['ax'].spines[axis].set_position(('outward', offsetb))
 
+    else:
+        if 'show' in pdata:
+            if 'right' in show:
+                pdata['ax'].spines['right'].set_bounds(ax_yy[0], ax_yy[1])
+                pdata['ax'].spines['right'].set_position(('outward', offsetl))
+            if 'left' in show:
+                pdata['ax'].spines['left'].set_bounds(ax_yy[0], ax_yy[1])
+                pdata['ax'].spines['left'].set_position(('outward', offsetl))
+            if 'top' in show:
+                pdata['ax'].spines['top'].set_bounds(ax_xx[0], ax_xx[1])
+                pdata['ax'].spines['top'].set_position(('outward', offsetl))
+            if 'bottom' in show:
+                pdata['ax'].spines['bottom'].set_bounds(ax_xx[0], ax_xx[1])
+                pdata['ax'].spines['bottom'].set_position(('outward', offsetl))
+
     # Fix aspect ratio
 
 #    if aspect==1:
@@ -1131,7 +1180,7 @@ def plotaxes(**pdata):
 
 ############# AUXILIARY FUNCTIONS #############
 
-def bezier(rad, angle, t, bezier_rad=0):
+def bezier(rad, angle, t, bezier_rad):
     """
     Generate quadratic Bezier curves between pairs of points in a circle, along with a third point
     selected according to the input Bezier radius.
@@ -1139,25 +1188,26 @@ def bezier(rad, angle, t, bezier_rad=0):
 
     # Convert points to cartesian
 
-    rad   = np.array(rad,float)
-    angle = np.array(angle,float)
+    rad    = np.array(rad, float)
+    angle  = np.array(angle, float)
+    cpolar = []
 
-    p1x, p1y = polar2cart(rad.T[0], angle.T[0])
-    p3x, p3y = polar2cart(rad.T[1], angle.T[1])
-    p2x, p2y = polar2cart(np.array([bezier_rad for i in range(len(rad))],float), (angle.T[0]+angle.T[1])/2.)
-    
-    p1 = [[p1x[i], p1y[i]] for i in range(len(p1x))]
-    p2 = [[p2x[i], p2y[i]] for i in range(len(p2x))]
-    p3 = [[p3x[i], p3y[i]] for i in range(len(p3x))]
+    if len(rad.T)>0:
+        p1x, p1y = polar2cart(rad.T[0], angle.T[0])
+        p3x, p3y = polar2cart(rad.T[1], angle.T[1])
+        p2x, p2y = polar2cart(np.array([bezier_rad[i] for i in range(len(rad))],float), (angle.T[0]+angle.T[1])/2.)
+        
+        p1 = [[p1x[i], p1y[i]] for i in range(len(p1x))]
+        p2 = [[p2x[i], p2y[i]] for i in range(len(p2x))]
+        p3 = [[p3x[i], p3y[i]] for i in range(len(p3x))]
 
-    # Get Bezier curves
+        # Get Bezier curves
 
-    curve  = [bezier_primitive(p1[i], p2[i], p3[i], t) for i in range(len(p1))]
+        curve  = [bezier_primitive(p1[i], p2[i], p3[i], t) for i in range(len(p1))]
 
-    # Convert to polar and return
+        # Convert to polar and return
 
-    #cpolar = [cart2polar(curve[i][0], curve[i][1]) for i in range(len(curve))]
-    cpolar = [[curve[i][0], curve[i][1]] for i in range(len(curve))]
+        cpolar = [[curve[i][0], curve[i][1]] for i in range(len(curve))]
     
     return cpolar
 
@@ -1238,7 +1288,7 @@ def getlogticks(lim, insertLow=False, insertHigh=True):
 
     low  = np.ceil(np.log10(lim[0]))
     high = np.floor(np.log10(lim[1]))
-    tick = np.logspace(low, high, num=1+high-low)
+    tick = np.logspace(low, high, num=int(1+high-low))
     
     if lim[0]!=10**low  and insertLow:  tick = np.insert(tick, 0,         lim[0])
     if lim[1]!=10**high and insertHigh: tick = np.insert(tick, len(tick), lim[1])
